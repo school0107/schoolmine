@@ -1,0 +1,229 @@
+# SchoolMine Booster Configuration
+# Mua booster bằng PlayerPoints
+
+boosters:
+  mining-3x3:
+    personal:
+      price-5m: 5
+      price-10m: 10
+      price-30m: 25
+      price-2h: 100
+    server:
+      price-5m: 10
+      price-10m: 25
+      price-30m: 60
+      price-2h: 240
+  multi-block:
+    personal:
+      price-5m: 5
+      price-10m: 10
+      price-30m: 25
+      price-2h: 100
+    server:
+      price-5m: 10
+      price-10m: 25
+      price-30m: 60
+      price-2h: 240
+  nuker:
+    personal:
+      price-5m: 10
+      price-10m: 20
+      price-30m: 60
+      price-2h: 200
+    server:
+      price-5m: 15
+      price-10m: 40
+      price-30m: 200
+      price-2h: 400
+  kill-shard:
+    personal:
+      price-5m: 10
+      price-10m: 20
+      price-30m: 60
+      price-2h: 200
+    server:
+      price-5m: 15
+      price-10m: 40
+      price-30m: 200
+      price-2h: 400
+
+nuker:
+  radius: 4
+  require-pickaxe: true
+  only-above-feet: true
+  # Nếu người chơi có quyền schoolmine.autosmelt thì tự nung block nuker phá
+  apply-autosmelt: true
+  whitelist:
+    - COAL_ORE
+    - DEEPSLATE_COAL_ORE
+    - IRON_ORE
+    - DEEPSLATE_IRON_ORE
+    - COPPER_ORE
+    - DEEPSLATE_COPPER_ORE
+    - GOLD_ORE
+    - DEEPSLATE_GOLD_ORE
+    - REDSTONE_ORE
+    - DEEPSLATE_REDSTONE_ORE
+    - LAPIS_ORE
+    - DEEPSLATE_LAPIS_ORE
+    - DIAMOND_ORE
+    - DEEPSLATE_DIAMOND_ORE
+    - EMERALD_ORE
+    - DEEPSLATE_EMERALD_ORE
+    - NETHER_GOLD_ORE
+    - NETHER_QUARTZ_ORE
+    - ANCIENT_DEBRIS
+  max-blocks-per-check: 25
+  check-interval-ticks: 15
+
+# =============================================
+# KILL SHARD Settings
+# Khi kill player sẽ chạy lệnh cho người kill
+# =============================================
+kill-shard:
+  # Lệnh chạy khi kill (dùng {player} = tên người kill, {victim} = tên người bị kill)
+  # Lệnh chạy từ console (không cần /)
+  commands:
+    - "give {player} minecraft:amethyst_shard 3"
+  # Thông báo cho người kill
+  message: "&a+3 &dAmethyst Shard &avì đã kill &e{victim}&a!"
+
+server-booster-title:
+  enabled: true
+  title: "&6&l⚡ SERVER BOOSTER ⚡"
+  subtitle: "&e{player} &7đã kích hoạt &a{type} &7cho server! &7(&e{duration}&7)"
+  fade-in: 10
+  stay: 60
+  fade-out: 10
+
+# =============================================
+# GUI TEXT Settings
+# =============================================
+gui:
+  main-title: "&8&l⚡ Booster Menu"
+
+  balance-item:
+    material: SUNFLOWER
+    name: "&e&lSố dư của bạn"
+    lore:
+      - "&7Points: &e{balance} &7⭐"
+
+  mining-3x3-personal:
+    material: DIAMOND_PICKAXE
+    name: "&b&l⛏ 3x3 Mining &7[Personal]"
+    lore:
+      - "&7Kích hoạt đào 3x3 cho riêng bạn."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  mining-3x3-server:
+    material: NETHERITE_PICKAXE
+    name: "&6&l⛏ 3x3 Mining &7[Server]"
+    lore:
+      - "&7Kích hoạt đào 3x3 cho toàn server."
+      - "&7Áp dụng cả người vừa tham gia."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  multi-block-personal:
+    material: EMERALD
+    name: "&a&l✦ x2 Block &7[Personal]"
+    lore:
+      - "&7Đào 1 block nhận 2 block cho riêng bạn."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  multi-block-server:
+    material: EMERALD_BLOCK
+    name: "&2&l✦ x2 Block &7[Server]"
+    lore:
+      - "&7Đào 1 block nhận 2 block cho toàn server."
+      - "&7Áp dụng cả người vừa tham gia."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  nuker-personal:
+    material: TNT
+    name: "&c&l☢ Nuker &7[Personal]"
+    lore:
+      - "&7Tự động phá block xung quanh bạn."
+      - "&7Khi bạn di chuyển đến."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  nuker-server:
+    material: TNT_MINECART
+    name: "&4&l☢ Nuker &7[Server]"
+    lore:
+      - "&7Tự động phá block xung quanh mọi người."
+      - "&7Áp dụng cả người vừa tham gia."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  kill-shard-personal:
+    material: AMETHYST_SHARD
+    name: "&d&l✦ Kill Shard &7[Personal]"
+    lore:
+      - "&7Nhận shard khi kill người chơi."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  kill-shard-server:
+    material: AMETHYST_CLUSTER
+    name: "&5&l✦ Kill Shard &7[Server]"
+    lore:
+      - "&7Mọi người nhận shard khi kill."
+      - "&7Áp dụng cả người vừa tham gia."
+      - ""
+      - "{status}"
+      - ""
+      - "&eClick để xem gói mua"
+
+  status-active: "&aĐang hoạt động: &e{time}"
+  status-inactive: "&cChưa kích hoạt"
+
+  purchase-title: "&8&l⚡ {type} &7[{scope}]"
+
+  purchase-item:
+    material: CLOCK
+    name: "&e&l⏱ {duration}"
+    lore:
+      - "&7Loại: &f{type} &7[{scope}]"
+      - "&7Thời gian: &f{duration}"
+      - "&7Giá: &e{price} &7⭐ Points"
+      - ""
+      - "{afford_status}"
+
+  afford-yes: "&aClick để mua"
+  afford-no: "&cKhông đủ điểm! (&e{balance}&c/&e{price}&c)"
+
+  info-item:
+    material: PAPER
+    name: "&b&lThông tin"
+    lore:
+      - "&7Loại: &f{type} [{scope}]"
+      - "{status}"
+      - ""
+      - "&7Thời gian được &acộng dồn &7nếu đã có booster."
+
+  back-button:
+    material: ARROW
+    name: "&c&l← Quay lại"
+    lore:
+      - "&7Về menu chính"
+
+  border-material: "GRAY_STAINED_GLASS_PANE"
