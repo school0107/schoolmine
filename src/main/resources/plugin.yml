@@ -1,0 +1,70 @@
+name: SchoolMine
+version: 1.0.0
+main: dev.schoolmine.schoolmine.SchoolMine
+api-version: '1.21'
+description: Auto Pickup, 3x3 Mining, Auto Smelt, Block Remove, Booster, AutoMine for Leaf/Paper/Purpur 1.21+
+authors: [SchoolMine]
+softdepend: [PlayerPoints]
+
+permissions:
+  schoolmine.autopickup:
+    description: Allow use /autopickup
+    default: op
+  schoolmine.3x3:
+    description: Allow use /3x3
+    default: op
+  schoolmine.autosmelt:
+    description: Allow use /autosmelt
+    default: op
+  schoolmine.reload:
+    description: Allow /schoolmine reload
+    default: op
+  schoolmine.breakblock:
+    description: Block placed by this player will be auto-removed. Set false to exempt.
+    default: true
+  schoolmine.booster:
+    description: Allow opening booster menu
+    default: true
+  schoolmine.booster.admin:
+    description: Allow admin booster commands
+    default: op
+  schoolmine.automine:
+    description: Allow use /automine
+    default: op
+  schoolmine.admin:
+    description: All SchoolMine permissions
+    default: op
+    children:
+      schoolmine.autopickup: true
+      schoolmine.3x3: true
+      schoolmine.autosmelt: true
+      schoolmine.reload: true
+      schoolmine.breakblock: true
+      schoolmine.booster: true
+      schoolmine.booster.admin: true
+      schoolmine.automine: true
+
+commands:
+  autopickup:
+    description: Toggle auto pickup
+    usage: /autopickup [on|off]
+    permission: schoolmine.autopickup
+  3x3:
+    description: Toggle 3x3 mining
+    usage: /3x3 [on|off]
+    permission: schoolmine.3x3
+  autosmelt:
+    description: Toggle auto smelt
+    usage: /autosmelt [on|off]
+    permission: schoolmine.autosmelt
+  schoolmine:
+    description: SchoolMine admin commands
+    usage: /schoolmine <reload|status|help>
+  booster:
+    description: Open booster menu
+    usage: /booster [clear <player|server> [type]|clearall]
+    permission: schoolmine.booster
+  automine:
+    description: Toggle auto mine (nuker)
+    usage: /automine [on|off]
+    permission: schoolmine.automine
