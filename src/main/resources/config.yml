@@ -1,0 +1,236 @@
+# SchoolMine Configuration
+# Plugin for Leaf/Paper/Purpur 1.21+
+
+# =============================================
+# AUTO PICKUP Settings
+# =============================================
+auto-pickup:
+  default-enabled: true
+  blacklist:
+    - DIRT
+    - GRAVEL
+    - SAND
+    - COBBLESTONE
+    - NETHERRACK
+    - STONE
+    - FLINT
+
+# =============================================
+# 3x3 MINING Settings
+# =============================================
+3x3-mining:
+  default-enabled: false
+  whitelist:
+    - COAL_ORE
+    - DEEPSLATE_COAL_ORE
+    - IRON_ORE
+    - DEEPSLATE_IRON_ORE
+    - COPPER_ORE
+    - DEEPSLATE_COPPER_ORE
+    - GOLD_ORE
+    - DEEPSLATE_GOLD_ORE
+    - REDSTONE_ORE
+    - DEEPSLATE_REDSTONE_ORE
+    - LAPIS_ORE
+    - DEEPSLATE_LAPIS_ORE
+    - DIAMOND_ORE
+    - DEEPSLATE_DIAMOND_ORE
+    - EMERALD_ORE
+    - DEEPSLATE_EMERALD_ORE
+    - NETHER_GOLD_ORE
+    - NETHER_QUARTZ_ORE
+    - ANCIENT_DEBRIS
+    - COAL_BLOCK
+    - IRON_BLOCK
+    - COPPER_BLOCK
+    - GOLD_BLOCK
+    - REDSTONE_BLOCK
+    - LAPIS_BLOCK
+    - DIAMOND_BLOCK
+    - EMERALD_BLOCK
+    - NETHERITE_BLOCK
+    - QUARTZ_BLOCK
+    - RAW_IRON_BLOCK
+    - RAW_COPPER_BLOCK
+    - RAW_GOLD_BLOCK
+    - AMETHYST_BLOCK
+  require-correct-tool: true
+  radius: 1
+
+# =============================================
+# AUTO SMELT Settings
+# =============================================
+auto-smelt:
+  default-enabled: false
+  smelt-map:
+    IRON_ORE: IRON_INGOT
+    DEEPSLATE_IRON_ORE: IRON_INGOT
+    GOLD_ORE: GOLD_INGOT
+    DEEPSLATE_GOLD_ORE: GOLD_INGOT
+    NETHER_GOLD_ORE: GOLD_NUGGET
+    COPPER_ORE: COPPER_INGOT
+    DEEPSLATE_COPPER_ORE: COPPER_INGOT
+    ANCIENT_DEBRIS: NETHERITE_SCRAP
+    COBBLESTONE: STONE
+    COBBLED_DEEPSLATE: DEEPSLATE
+    SAND: GLASS
+    CLAY: BRICK
+    NETHERRACK: NETHER_BRICK
+    RAW_IRON: IRON_INGOT
+    RAW_GOLD: GOLD_INGOT
+    RAW_COPPER: COPPER_INGOT
+
+# =============================================
+# BLOCK REMOVE Settings
+# Block do người chơi đặt sẽ tự biến mất sau delay-seconds
+# =============================================
+block-remove:
+  enabled: true
+  delay-seconds: 120
+  world-whitelist:
+    - world
+    - world_nether
+    - world_the_end
+  blacklist:
+    - CHEST
+    - TRAPPED_CHEST
+    - ENDER_CHEST
+    - BARREL
+    - FURNACE
+    - BLAST_FURNACE
+    - SMOKER
+    - CRAFTING_TABLE
+    - ANVIL
+    - CHIPPED_ANVIL
+    - DAMAGED_ANVIL
+    - ENCHANTING_TABLE
+    - BEACON
+    - SHULKER_BOX
+    - WHITE_SHULKER_BOX
+    - ORANGE_SHULKER_BOX
+    - MAGENTA_SHULKER_BOX
+    - LIGHT_BLUE_SHULKER_BOX
+    - YELLOW_SHULKER_BOX
+    - LIME_SHULKER_BOX
+    - PINK_SHULKER_BOX
+    - GRAY_SHULKER_BOX
+    - LIGHT_GRAY_SHULKER_BOX
+    - CYAN_SHULKER_BOX
+    - PURPLE_SHULKER_BOX
+    - BLUE_SHULKER_BOX
+    - BROWN_SHULKER_BOX
+    - GREEN_SHULKER_BOX
+    - RED_SHULKER_BOX
+    - BLACK_SHULKER_BOX
+    - HOPPER
+    - DROPPER
+    - DISPENSER
+    - SPAWNER
+    - BEDROCK
+    - COMMAND_BLOCK
+    - CHAIN_COMMAND_BLOCK
+    - REPEATING_COMMAND_BLOCK
+    - STRUCTURE_BLOCK
+    - JIGSAW
+    - BARRIER
+  persist-on-restart: true
+  max-queue-size: 100000
+  check-interval-ticks: 40
+
+# =============================================
+# Messages
+# =============================================
+messages:
+  prefix: "&8[&6SchoolMine&8] &r"
+  autopickup-on: "&aAuto Pickup: &2ON"
+  autopickup-off: "&cAuto Pickup: &4OFF"
+  mining3x3-on: "&a3x3 Mining: &2ON"
+  mining3x3-off: "&c3x3 Mining: &4OFF"
+  autosmelt-on: "&aAuto Smelt: &2ON"
+  autosmelt-off: "&cAuto Smelt: &4OFF"
+  no-permission: "&cBạn không có quyền sử dụng lệnh này!"
+  reload-success: "&aPlugin đã được reload thành công!"
+  usage-autopickup: "&eUsage: /autopickup [on|off]"
+  usage-3x3: "&eUsage: /3x3 [on|off]"
+  usage-autosmelt: "&eUsage: /autosmelt [on|off]"
+
+# =============================================
+# Performance Settings
+# =============================================
+performance:
+  auto-save-interval: 300
+  max-3x3-blocks: 27
+
+# =============================================
+# AUTO MINE Settings (/automine)
+# Nuker tích hợp vĩnh viễn, không cần booster
+# Tốc độ và drop phụ thuộc tool + enchant
+# =============================================
+auto-mine:
+  default-enabled: false
+  radius: 3
+  only-above-feet: true
+  require-pickaxe: true
+
+  whitelist:
+    - STONE
+    - COBBLESTONE
+    - DEEPSLATE
+    - COBBLED_DEEPSLATE
+    - GRANITE
+    - DIORITE
+    - ANDESITE
+    - TUFF
+    - CALCITE
+    - NETHERRACK
+    - COAL_ORE
+    - DEEPSLATE_COAL_ORE
+    - IRON_ORE
+    - DEEPSLATE_IRON_ORE
+    - COPPER_ORE
+    - DEEPSLATE_COPPER_ORE
+    - GOLD_ORE
+    - DEEPSLATE_GOLD_ORE
+    - REDSTONE_ORE
+    - DEEPSLATE_REDSTONE_ORE
+    - LAPIS_ORE
+    - DEEPSLATE_LAPIS_ORE
+    - DIAMOND_ORE
+    - DEEPSLATE_DIAMOND_ORE
+    - EMERALD_ORE
+    - DEEPSLATE_EMERALD_ORE
+    - NETHER_GOLD_ORE
+    - NETHER_QUARTZ_ORE
+    - ANCIENT_DEBRIS
+
+  # Số block tối đa mỗi lần check
+  max-blocks-per-tick: 20
+
+  # Interval cơ bản (ticks) - sẽ chia cho hệ số tool
+  base-interval-ticks: 20
+
+  # Hệ số tốc độ theo tool (interval = base / multiplier, tối thiểu 1 tick)
+  tool-speed:
+    WOODEN_PICKAXE: 0.5
+    STONE_PICKAXE: 1.0
+    IRON_PICKAXE: 1.5
+    GOLDEN_PICKAXE: 2.0
+    DIAMOND_PICKAXE: 2.5
+    NETHERITE_PICKAXE: 3.0
+
+  # Mỗi level Efficiency cộng thêm vào hệ số tốc độ
+  efficiency-bonus-per-level: 0.4
+
+  # Fortune ảnh hưởng drop (nhân ngẫu nhiên theo level)
+  apply-fortune: true
+
+  # Silk touch: drop block nguyên
+  apply-silk-touch: true
+
+  # Tích hợp autosmelt của người chơi
+  apply-autosmelt: true
+
+  # Tích hợp autopickup của người chơi
+  apply-autopickup: true
+  automine-on: "&aAuto Mine: &2ON"
+  automine-off: "&cAuto Mine: &4OFF"
