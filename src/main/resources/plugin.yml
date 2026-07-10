@@ -4,30 +4,24 @@ main: com.schoolmine.SchoolMine
 api-version: '1.21'
 softdepend: [PlayerPoints]
 authors: [school0107]
-description: SchoolMine core plugin with advanced mining features.
+[cite_start]description: SchoolMine core plugin with advanced mining features. [cite: 53]
 
 commands:
   schoolmine:
-    description: Lenh quan tri plugin SchoolMine.
+    [cite_start]description: Lenh quan tri admin. [cite: 67]
     permission: schoolmine.admin
-    usage: /schoolmine [reload|status|help]
   autopickup:
-    description: Bat tat tu dong nhat do.
+    [cite_start]description: Bat tat tu dong nhat do. [cite: 53]
     permission: schoolmine.autopickup
-    usage: /autopickup [on|off]
   autosmelt:
-    description: Bat tat tu dong nung quang.
+    [cite_start]description: Bat tat tu dong nung quang. [cite: 56]
     permission: schoolmine.autosmelt
-    usage: /autosmelt [on|off]
   3x3:
-    description: Bat tat che do dao 3x3.
+    [cite_start]description: Bat tat che do dao 3x3. [cite: 55]
     permission: schoolmine.3x3
-    usage: /3x3 [on|off]
   automine:
-    description: Bat tat che do tu dong dao khoang san xung quanh.
+    [cite_start]description: Bat tat che do tu dong dao. [cite: 57]
     permission: schoolmine.automine
-    usage: /automine [on|off]
   booster:
-    description: Mo menu mua booster bang PlayerPoints.
+    [cite_start]description: Mo menu mua booster bang PlayerPoints. [cite: 60, 61]
     permission: schoolmine.booster
-    usage: /booster
