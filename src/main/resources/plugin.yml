@@ -1,0 +1,12 @@
+name: SchoolMine
+version: 1.0.0
+main: com.schoolmine.SchoolMine
+api-version: '1.21'
+depend: [PlayerPoints]
+commands:
+  autopickup:
+    [cite_start]description: Bat/Tat tu dong nhat item vào kho do [cite: 1]
+    permission: schoolmine.autopickup
+  autosmelt:
+    [cite_start]description: Bat/Tat tu dong nung quang thanh ingot [cite: 3]
+    permission: schoolmine.autosmelt
