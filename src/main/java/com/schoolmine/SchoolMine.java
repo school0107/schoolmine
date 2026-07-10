@@ -33,7 +33,6 @@ public final class SchoolMine extends JavaPlugin implements Listener {
     public final HashMap<UUID, Boolean> mining3x3Users = new HashMap<>();
     public final HashMap<UUID, Boolean> autoMineUsers = new HashMap<>();
 
-    // Hệ thống Block Remove Queue
     public final Map<Location, Long> blockRemoveQueue = new HashMap<>();
     private FileConfiguration boosterConfig;
     private FileConfiguration queueStorage;
@@ -45,7 +44,6 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         saveResource("booster.yml", false);
         loadBoosterConfig();
         
-        // Khởi tạo và nạp hàng đợi lưu trữ Block Remove
         queueFile = new File(getDataFolder(), "blockremove_queue.yml");
         if (!queueFile.exists()) {
             try { queueFile.createNewFile(); } catch (IOException ignored) {}
@@ -53,18 +51,15 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         queueStorage = YamlConfiguration.loadConfiguration(queueFile);
         loadBlockQueue();
 
-        // Đăng ký toàn bộ sự kiện
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new MiningListener(this), this);
 
-        // Đăng ký Bộ lệnh thực thi
         MineCommands commands = new MineCommands(this);
         String[] cmdList = {"autopickup", "autosmelt", "3x3", "automine", "booster", "schoolmine"};
         for (String cmd : cmdList) {
             if (getCommand(cmd) != null) getCommand(cmd).setExecutor(commands);
         }
 
-        // Tạo vòng lặp Scheduler kiểm tra xóa khối theo cấu hình ticks (mặc định 40)
         int ticks = getConfig().getInt("block-remove.check-interval-ticks", 40);
         new BukkitRunnable() {
             @Override
@@ -109,13 +104,11 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         return (prefix + message).replace("&", "§");
     }
 
-    // Sự kiện lắng nghe đặt block để đưa vào hàng chờ xóa (Block Remove)
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if (!getConfig().getBoolean("block-remove.enabled", true)) return;
         Player player = event.getPlayer();
         
-        // Trừ khử các đối tượng có quyền miễn trừ bypass
         if (player.hasPermission("schoolmine.breakblock") && !getConfig().getBoolean("schoolmine.breakblock", true)) {
             return;
         }
@@ -131,16 +124,14 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         blockRemoveQueue.put(event.getBlock().getLocation(), System.currentTimeMillis() + delayMs);
     }
 
-    // Sự kiện lắng nghe người chơi di chuyển xử lý Auto Mine (Nuker vĩnh viễn)
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!autoMineUsers.getOrDefault(player.getUniqueId(), false)) return;
 
         ItemStack tool = player.getInventory().getItemInMainHand();
-        if (!tool.getType().name().contains("PICKAXE")) return; // Chỉ hoạt động khi cầm cuốc
+        if (!tool.getType().name().contains("PICKAXE")) return;
 
-        // Tìm bán kính quét thông qua cấu hình quyền hạn Permission cao nhất
         int radius = getConfig().getInt("auto-mine.default-radius", 2);
         for (int i = 6; i >= 1; i--) {
             if (player.hasPermission("automine." + i)) {
@@ -157,7 +148,6 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         int maxBlocks = getBoosterConfig().getInt("nuker.max-blocks-per-check", 25);
         int broken = 0;
 
-        // Tính toán tốc độ xử lý block dựa theo chất liệu cuốc và bùa hiệu suất Efficiency
         double speedFactor = 1.0;
         String toolName = tool.getType().name();
         if (toolName.contains("WOODEN")) speedFactor = 0.5;
@@ -174,13 +164,11 @@ public final class SchoolMine extends JavaPlugin implements Listener {
             }
         }
 
-        // Vòng lặp quét tọa độ lập phương không gian xung quanh người chơi
         for (int x = -radius; x <= radius && broken < maxBlocks * speedFactor; x++) {
-            for (int y = 0; y <= radius; y++) { // Chỉ quét từ ngang chân trở lên
+            for (int y = 0; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
                     Block b = loc.clone().add(x, y, z).getBlock();
                     if (whitelist.contains(b.getType().name())) {
-                        // Kích hoạt phá block giả lập hành vi đào tự nhiên hợp lệ
                         player.breakBlock(b);
                         broken++;
                     }
@@ -206,6 +194,7 @@ public final class SchoolMine extends JavaPlugin implements Listener {
 
     private void loadBlockQueue() {
         if (!queueStorage.contains("queue")) return;
+        if (queueStorage.getConfigurationSection("queue") == null) return;
         for (String key : queueStorage.getConfigurationSection("queue").getKeys(false)) {
             String path = "queue." + key;
             String worldName = queueStorage.getString(path + ".world");
@@ -221,9 +210,6 @@ public final class SchoolMine extends JavaPlugin implements Listener {
     }
 }
 
-/**
- * LỚP LẮNG NGHE SỰ KIỆN KHAI THÁC QUẶNG
- */
 class MiningListener implements Listener {
     private final SchoolMine plugin;
 
@@ -291,9 +277,6 @@ class MiningListener implements Listener {
     }
 }
 
-/**
- * LỚP THỰC THI VÀ XỬ LÝ LỆNH
- */
 class MineCommands implements CommandExecutor {
     private final SchoolMine plugin;
 
@@ -355,7 +338,6 @@ class MineCommands implements CommandExecutor {
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("booster")) {
-            // Mở hờ giao diện rỗng để cấu hình đồng bộ không lỗi với GUI buy booster của PlayerPoints
             player.sendMessage(plugin.getBoosterConfig().getString("gui.main-title", "&8&l⚡ Booster Menu").replace("&", "§"));
             return true;
         }
