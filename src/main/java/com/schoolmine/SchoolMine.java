@@ -21,6 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.black_ixx.playerpoints.PlayerPoints;
+import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -37,7 +39,7 @@ public final class SchoolMine extends JavaPlugin implements Listener {
     private FileConfiguration boosterConfig;
     private FileConfiguration queueStorage;
     private File queueFile;
-    private boolean usePlayerPoints = false;
+    private PlayerPointsAPI ppAPI;
 
     @Override
     public void onEnable() {
@@ -45,8 +47,9 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         saveResource("booster.yml", false);
         loadBoosterConfig();
         
+        // Kết nối trực tiếp qua API PlayerPoints an toàn
         if (getServer().getPluginManager().getPlugin("PlayerPoints") != null) {
-            this.usePlayerPoints = true;
+            this.ppAPI = PlayerPoints.getInstance().getAPI();
         }
         
         queueFile = new File(getDataFolder(), "blockremove_queue.yml");
@@ -103,8 +106,8 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         return this.boosterConfig;
     }
 
-    public boolean hasPlayerPoints() {
-        return this.usePlayerPoints;
+    public PlayerPointsAPI getPlayerPointsAPI() {
+        return this.ppAPI;
     }
 
     public String getMsg(String path) {
@@ -347,8 +350,9 @@ class MineCommands implements CommandExecutor {
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("booster")) {
-            if (plugin.hasPlayerPoints()) {
-                player.sendMessage("§a[PlayerPoints] Đang kết nối đồng bộ hệ thống...");
+            if (plugin.getPlayerPointsAPI() != null) {
+                int points = plugin.getPlayerPointsAPI().look(player.getUniqueId());
+                player.sendMessage("§aSố dư Points hiện tại của bạn: §e" + points);
             }
             player.sendMessage(plugin.getBoosterConfig().getString("gui.main-title", "&8&l⚡ Booster Menu").replace("&", "§"));
             return true;
