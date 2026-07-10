@@ -6,6 +6,9 @@
 # =============================================
 # AUTO PICKUP Settings
 # =============================================
+# =============================================
+# AUTO PICKUP Settings
+# =============================================
 auto-pickup:
   default-enabled: true
   blacklist:
@@ -21,6 +24,7 @@ auto-pickup:
 # =============================================
 3x3-mining:
   default-enabled: false
+  require-correct-tool: true
   whitelist:
     - COAL_ORE
     - DEEPSLATE_COAL_ORE
@@ -50,12 +54,6 @@ auto-pickup:
     - DIAMOND_BLOCK
     - EMERALD_BLOCK
     - NETHERITE_BLOCK
-    - QUARTZ_BLOCK
-    - RAW_IRON_BLOCK
-    - RAW_COPPER_BLOCK
-    - RAW_GOLD_BLOCK
-    - AMETHYST_BLOCK
-    - STONE
   require-correct-tool: true
   radius: 1
 
