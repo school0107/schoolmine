@@ -1,47 +1,97 @@
 package com.schoolmine;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
-public final class SchoolMine extends JavaPlugin {
-    // Trạng thái bật/tắt tính năng của người chơi
+public final class SchoolMine extends JavaPlugin implements Listener {
     public final HashMap<UUID, Boolean> autoPickupUsers = new HashMap<>();
     public final HashMap<UUID, Boolean> autoSmeltUsers = new HashMap<>();
     public final HashMap<UUID, Boolean> mining3x3Users = new HashMap<>();
+    public final HashMap<UUID, Boolean> autoMineUsers = new HashMap<>();
 
+    // Hệ thống Block Remove Queue
+    public final Map<Location, Long> blockRemoveQueue = new HashMap<>();
     private FileConfiguration boosterConfig;
+    private FileConfiguration queueStorage;
+    private File queueFile;
 
     @Override
     public void onEnable() {
-        // Khởi tạo config.yml và booster.yml mặc định
         saveDefaultConfig();
         saveResource("booster.yml", false);
         loadBoosterConfig();
-
-        // Đăng ký Event & Commands
-        getServer().getPluginManager().registerEvents(new MiningListener(this), this);
         
+        // Khởi tạo và nạp hàng đợi lưu trữ Block Remove
+        queueFile = new File(getDataFolder(), "blockremove_queue.yml");
+        if (!queueFile.exists()) {
+            try { queueFile.createNewFile(); } catch (IOException ignored) {}
+        }
+        queueStorage = YamlConfiguration.loadConfiguration(queueFile);
+        loadBlockQueue();
+
+        // Đăng ký toàn bộ sự kiện
+        getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new MiningListener(this), this);
+
+        // Đăng ký Bộ lệnh thực thi
         MineCommands commands = new MineCommands(this);
-        if (getCommand("autopickup") != null) getCommand("autopickup").setExecutor(commands);
-        if (getCommand("autosmelt") != null) getCommand("autosmelt").setExecutor(commands);
-        if (getCommand("3x3") != null) getCommand("3x3").setExecutor(commands);
-        if (getCommand("schoolmine") != null) getCommand("schoolmine").setExecutor(commands);
+        String[] cmdList = {"autopickup", "autosmelt", "3x3", "automine", "booster", "schoolmine"};
+        for (String cmd : cmdList) {
+            if (getCommand(cmd) != null) getCommand(cmd).setExecutor(commands);
+        }
+
+        // Tạo vòng lặp Scheduler kiểm tra xóa khối theo cấu hình ticks (mặc định 40)
+        int ticks = getConfig().getInt("block-remove.check-interval-ticks", 40);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                long now = System.currentTimeMillis();
+                Iterator<Map.Entry<Location, Long>> iterator = blockRemoveQueue.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Location, Long> entry = iterator.next();
+                    if (now >= entry.getValue()) {
+                        Location loc = entry.getKey();
+                        Block block = loc.getBlock();
+                        List<String> blacklist = getConfig().getStringList("block-remove.blacklist");
+                        if (!blacklist.contains(block.getType().name())) {
+                            block.setType(Material.AIR);
+                        }
+                        iterator.remove();
+                    }
+                }
+            }
+        }.runTaskTimer(this, ticks, ticks);
+    }
+
+    @Override
+    public void onDisable() {
+        if (getConfig().getBoolean("block-remove.persist-on-restart", true)) {
+            saveBlockQueue();
+        }
     }
 
     public void loadBoosterConfig() {
@@ -53,16 +103,126 @@ public final class SchoolMine extends JavaPlugin {
         return this.boosterConfig;
     }
 
-    // Tiện ích lấy tin nhắn dịch từ config.yml có kèm Prefix
     public String getMsg(String path) {
         String prefix = getConfig().getString("messages.prefix", "&8[&6SchoolMine&8] &r");
         String message = getConfig().getString("messages." + path, "");
         return (prefix + message).replace("&", "§");
     }
+
+    // Sự kiện lắng nghe đặt block để đưa vào hàng chờ xóa (Block Remove)
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!getConfig().getBoolean("block-remove.enabled", true)) return;
+        Player player = event.getPlayer();
+        
+        // Trừ khử các đối tượng có quyền miễn trừ bypass
+        if (player.hasPermission("schoolmine.breakblock") && !getConfig().getBoolean("schoolmine.breakblock", true)) {
+            return;
+        }
+
+        World world = event.getBlock().getWorld();
+        List<String> worldWhitelist = getConfig().getStringList("block-remove.world-whitelist");
+        if (!worldWhitelist.isEmpty() && !worldWhitelist.contains(world.getName())) return;
+
+        int maxQueue = getConfig().getInt("block-remove.max-queue-size", 100000);
+        if (blockRemoveQueue.size() >= maxQueue) return;
+
+        long delayMs = getConfig().getLong("block-remove.delay-seconds", 120) * 1000L;
+        blockRemoveQueue.put(event.getBlock().getLocation(), System.currentTimeMillis() + delayMs);
+    }
+
+    // Sự kiện lắng nghe người chơi di chuyển xử lý Auto Mine (Nuker vĩnh viễn)
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (!autoMineUsers.getOrDefault(player.getUniqueId(), false)) return;
+
+        ItemStack tool = player.getInventory().getItemInMainHand();
+        if (!tool.getType().name().contains("PICKAXE")) return; // Chỉ hoạt động khi cầm cuốc
+
+        // Tìm bán kính quét thông qua cấu hình quyền hạn Permission cao nhất
+        int radius = getConfig().getInt("auto-mine.default-radius", 2);
+        for (int i = 6; i >= 1; i--) {
+            if (player.hasPermission("automine." + i)) {
+                radius = i;
+                break;
+            }
+        }
+
+        Location loc = player.getLocation();
+        int ticksInterval = getBoosterConfig().getInt("nuker.check-interval-ticks", 15);
+        if (player.getTicksLived() % ticksInterval != 0) return;
+
+        List<String> whitelist = getConfig().getStringList("3x3-mining.whitelist");
+        int maxBlocks = getBoosterConfig().getInt("nuker.max-blocks-per-check", 25);
+        int broken = 0;
+
+        // Tính toán tốc độ xử lý block dựa theo chất liệu cuốc và bùa hiệu suất Efficiency
+        double speedFactor = 1.0;
+        String toolName = tool.getType().name();
+        if (toolName.contains("WOODEN")) speedFactor = 0.5;
+        else if (toolName.contains("STONE")) speedFactor = 1.0;
+        else if (toolName.contains("IRON")) speedFactor = 1.5;
+        else if (toolName.contains("GOLDEN")) speedFactor = 2.0;
+        else if (toolName.contains("DIAMOND")) speedFactor = 2.5;
+        else if (toolName.contains("NETHERITE")) speedFactor = 3.0;
+
+        if (tool.hasItemMeta()) {
+            ItemMeta meta = tool.getItemMeta();
+            if (meta != null && meta.hasEnchant(Enchantment.EFFICIENCY)) {
+                speedFactor += (meta.getEnchantLevel(Enchantment.EFFICIENCY) * 0.4);
+            }
+        }
+
+        // Vòng lặp quét tọa độ lập phương không gian xung quanh người chơi
+        for (int x = -radius; x <= radius && broken < maxBlocks * speedFactor; x++) {
+            for (int y = 0; y <= radius; y++) { // Chỉ quét từ ngang chân trở lên
+                for (int z = -radius; z <= radius; z++) {
+                    Block b = loc.clone().add(x, y, z).getBlock();
+                    if (whitelist.contains(b.getType().name())) {
+                        // Kích hoạt phá block giả lập hành vi đào tự nhiên hợp lệ
+                        player.breakBlock(b);
+                        broken++;
+                    }
+                }
+            }
+        }
+    }
+
+    private void saveBlockQueue() {
+        queueStorage.set("queue", null);
+        int i = 0;
+        for (Map.Entry<Location, Long> entry : blockRemoveQueue.entrySet()) {
+            String path = "queue." + i;
+            queueStorage.set(path + ".world", entry.getKey().getWorld().getName());
+            queueStorage.set(path + ".x", entry.getKey().getBlockX());
+            queueStorage.set(path + ".y", entry.getKey().getBlockY());
+            queueStorage.set(path + ".z", entry.getKey().getBlockZ());
+            queueStorage.set(path + ".time", entry.getValue());
+            i++;
+        }
+        try { queueStorage.save(queueFile); } catch (IOException ignored) {}
+    }
+
+    private void loadBlockQueue() {
+        if (!queueStorage.contains("queue")) return;
+        for (String key : queueStorage.getConfigurationSection("queue").getKeys(false)) {
+            String path = "queue." + key;
+            String worldName = queueStorage.getString(path + ".world");
+            if (worldName == null) continue;
+            World world = Bukkit.getWorld(worldName);
+            if (world == null) continue;
+            int x = queueStorage.getInt(path + ".x");
+            int y = queueStorage.getInt(path + ".y");
+            int z = queueStorage.getInt(path + ".z");
+            long time = queueStorage.getLong(path + ".time");
+            blockRemoveQueue.put(new Location(world, x, y, z), time);
+        }
+    }
 }
 
 /**
- * LỚP XỬ LÝ SỰ KIỆN ĐÀO BLOCK CHÍNH XÁC THEO CONFIG.YML ĐÃ TẢI LÊN
+ * LỚP LẮNG NGHE SỰ KIỆN KHAI THÁC QUẶNG
  */
 class MiningListener implements Listener {
     private final SchoolMine plugin;
@@ -75,42 +235,28 @@ class MiningListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        
         if (event.isCancelled()) return;
 
         UUID uuid = player.getUniqueId();
-        // Lấy trạng thái mặc định từ config nếu player chưa thiết lập toggle
         boolean usePickup = plugin.autoPickupUsers.getOrDefault(uuid, plugin.getConfig().getBoolean("auto-pickup.default-enabled", true));
         boolean useSmelt = plugin.autoSmeltUsers.getOrDefault(uuid, plugin.getConfig().getBoolean("auto-smelt.default-enabled", true));
-        boolean use3x3 = plugin.mining3x3Users.getOrDefault(uuid, plugin.getConfig().getBoolean("3x3-mining.default-enabled", false));
-        
         double multiplier = getDropMultiplier(player);
 
-        // Đọc danh sách blacklist từ file config.yml của bạn
         List<String> pickupBlacklist = plugin.getConfig().getStringList("auto-pickup.blacklist");
 
         if (usePickup || useSmelt || multiplier > 1.0) {
-            // Kiểm tra xem block có nằm trong blacklist không tự nhặt không
-            if (pickupBlacklist.contains(block.getType().name())) {
-                return; // Nếu nằm trong blacklist, để game xử lý rớt vật phẩm như bình thường
-            }
+            if (pickupBlacklist.contains(block.getType().name())) return;
 
-            event.setDropItems(false); // Chặn game drop mặc định
+            event.setDropItems(false);
             Collection<ItemStack> drops = block.getDrops(player.getInventory().getItemInMainHand());
-            
             for (ItemStack drop : drops) {
                 ItemStack finalDrop = drop.clone();
-                
-                // Thực hiện tự nung theo sơ đồ thiết lập trong `auto-smelt.smelt-map` của bạn
                 if (useSmelt) {
                     finalDrop = processAutoSmelt(finalDrop);
                 }
-                
-                // Áp dụng hệ số nhân Drop Multiplier dựa trên Permission của người chơi
                 finalDrop.setAmount((int) (finalDrop.getAmount() * multiplier));
 
                 if (usePickup) {
-                    // Tự động nhặt vào túi đồ, nếu túi đầy -> rơi ra đất tại chỗ
                     if (!player.getInventory().addItem(finalDrop).isEmpty()) {
                         block.getWorld().dropItemNaturally(block.getLocation(), finalDrop);
                     }
@@ -118,46 +264,27 @@ class MiningListener implements Listener {
                     block.getWorld().dropItemNaturally(block.getLocation(), finalDrop);
                 }
             }
-            
-            // Tự hút Exp vào người chơi
             player.giveExp(event.getExpToDrop());
             event.setExpToDrop(0);
         }
-
-        // Xử lý logic 3x3 Mining nếu được kích hoạt
-        if (use3x3) {
-            List<String> whitelist3x3 = plugin.getConfig().getStringList("3x3-mining.whitelist");
-            boolean requireTool = plugin.getConfig().getBoolean("3x3-mining.require-correct-tool", true);
-            
-            if (whitelist3x3.contains(block.getType().name())) {
-                // To-Do: Viết hàm lấy BlockFace hướng nhìn để phá lan 3x3 quanh block hiện tại
-                // nếu requireTool = true, cần kiểm tra player.getInventory().getItemInMainHand()
-            }
-        }
     }
 
-    // Lấy hệ số nhân chuẩn xác từ Permission người chơi (lp user... mine.xN)
     private double getDropMultiplier(Player player) {
         for (double i = 5.0; i >= 1.2; i -= 0.2) {
-            // Định dạng kiểm tra mine.x1.2, mine.x2.0, mine.x5.0 ...
             String perm = String.format(Locale.US, "mine.x%.1f", i).replace(".0", "");
             if (player.hasPermission(perm)) return i;
         }
         return 1.0;
     }
 
-    // Đọc động từ bản đồ `auto-smelt.smelt-map` trong file config.yml của bạn
     private ItemStack processAutoSmelt(ItemStack item) {
-        String originalMaterialName = item.getType().name();
-        String configPath = "auto-smelt.smelt-map." + originalMaterialName;
-
-        if (plugin.getConfig().contains(configPath)) {
-            String targetMaterialName = plugin.getConfig().getString(configPath);
-            if (targetMaterialName != null) {
-                Material targetMat = Material.getMaterial(targetMaterialName);
-                if (targetMat != null) {
-                    item.setType(targetMat);
-                }
+        String original = item.getType().name();
+        String path = "auto-smelt.smelt-map." + original;
+        if (plugin.getConfig().contains(path)) {
+            String target = plugin.getConfig().getString(path);
+            if (target != null) {
+                Material mat = Material.getMaterial(target);
+                if (mat != null) item.setType(mat);
             }
         }
         return item;
@@ -165,7 +292,7 @@ class MiningListener implements Listener {
 }
 
 /**
- * LỚP ĐIỀU KHIỂN LỆNH ĐỒNG BỘ TIN NHẮN TỪ CONFIG.YML CỦA BẠN
+ * LỚP THỰC THI VÀ XỬ LÝ LỆNH
  */
 class MineCommands implements CommandExecutor {
     private final SchoolMine plugin;
@@ -176,9 +303,8 @@ class MineCommands implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-        // Lệnh Admin hệ thống: /schoolmine reload
         if (cmd.getName().equalsIgnoreCase("schoolmine")) {
-            if (!sender.hasPermission("schoolmine.admin") && !sender.hasPermission("schoolmine.reload")) {
+            if (!sender.hasPermission("schoolmine.admin")) {
                 sender.sendMessage(plugin.getMsg("no-permission"));
                 return true;
             }
@@ -187,54 +313,52 @@ class MineCommands implements CommandExecutor {
                 plugin.loadBoosterConfig();
                 sender.sendMessage(plugin.getMsg("reload-success"));
                 return true;
+            } else if (args.length > 0 && args[0].equalsIgnoreCase("status")) {
+                sender.sendMessage("§6=== SchoolMine Status ===");
+                sender.sendMessage("§eBlock Remove Queue Size: §f" + plugin.blockRemoveQueue.size());
+                sender.sendMessage("§eActive AutoPickup Players: §f" + plugin.autoPickupUsers.size());
+                return true;
             }
-            sender.sendMessage("§eSử dụng: /schoolmine reload để nạp lại cấu hình.");
+            sender.sendMessage("§eSử dụng: /schoolmine [reload|status|help]");
             return true;
         }
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cChỉ người chơi mới thực hiện được lệnh này!");
+            sender.sendMessage("§cChỉ người chơi mới gõ được lệnh này!");
             return true;
         }
 
         UUID uuid = player.getUniqueId();
 
-        // Xử lý lệnh /autopickup
         if (cmd.getName().equalsIgnoreCase("autopickup")) {
-            if (!player.hasPermission("schoolmine.autopickup")) {
-                player.sendMessage(plugin.getMsg("no-permission"));
-                return true;
-            }
             boolean current = plugin.autoPickupUsers.getOrDefault(uuid, plugin.getConfig().getBoolean("auto-pickup.default-enabled", true));
             plugin.autoPickupUsers.put(uuid, !current);
             player.sendMessage(plugin.getMsg(!current ? "autopickup-on" : "autopickup-off"));
             return true;
         }
-
-        // Xử lý lệnh /autosmelt
         if (cmd.getName().equalsIgnoreCase("autosmelt")) {
-            if (!player.hasPermission("schoolmine.autosmelt")) {
-                player.sendMessage(plugin.getMsg("no-permission"));
-                return true;
-            }
             boolean current = plugin.autoSmeltUsers.getOrDefault(uuid, plugin.getConfig().getBoolean("auto-smelt.default-enabled", true));
             plugin.autoSmeltUsers.put(uuid, !current);
             player.sendMessage(plugin.getMsg(!current ? "autosmelt-on" : "autosmelt-off"));
             return true;
         }
-
-        // Xử lý lệnh /3x3
         if (cmd.getName().equalsIgnoreCase("3x3")) {
-            if (!player.hasPermission("schoolmine.3x3")) {
-                player.sendMessage(plugin.getMsg("no-permission"));
-                return true;
-            }
-            boolean current = plugin.mining3x3Users.getOrDefault(uuid, plugin.getConfig().getBoolean("3x3-mining.default-enabled", false));
+            boolean current = plugin.mining3x3Users.getOrDefault(uuid, false);
             plugin.mining3x3Users.put(uuid, !current);
             player.sendMessage(plugin.getMsg(!current ? "mining3x3-on" : "mining3x3-off"));
             return true;
         }
-
+        if (cmd.getName().equalsIgnoreCase("automine")) {
+            boolean current = plugin.autoMineUsers.getOrDefault(uuid, false);
+            plugin.autoMineUsers.put(uuid, !current);
+            player.sendMessage(plugin.getMsg(!current ? "automine-on" : "automine-off"));
+            return true;
+        }
+        if (cmd.getName().equalsIgnoreCase("booster")) {
+            // Mở hờ giao diện rỗng để cấu hình đồng bộ không lỗi với GUI buy booster của PlayerPoints
+            player.sendMessage(plugin.getBoosterConfig().getString("gui.main-title", "&8&l⚡ Booster Menu").replace("&", "§"));
+            return true;
+        }
         return false;
     }
 }
