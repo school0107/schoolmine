@@ -21,8 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.black_ixx.playerpoints.PlayerPoints;
-import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -39,7 +37,7 @@ public final class SchoolMine extends JavaPlugin implements Listener {
     private FileConfiguration boosterConfig;
     private FileConfiguration queueStorage;
     private File queueFile;
-    private PlayerPointsAPI ppAPI;
+    private boolean usePlayerPoints = false;
 
     @Override
     public void onEnable() {
@@ -48,7 +46,7 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         loadBoosterConfig();
         
         if (getServer().getPluginManager().getPlugin("PlayerPoints") != null) {
-            this.ppAPI = PlayerPoints.getInstance().getAPI();
+            this.usePlayerPoints = true;
         }
         
         queueFile = new File(getDataFolder(), "blockremove_queue.yml");
@@ -105,8 +103,8 @@ public final class SchoolMine extends JavaPlugin implements Listener {
         return this.boosterConfig;
     }
 
-    public PlayerPointsAPI getPlayerPointsAPI() {
-        return this.ppAPI;
+    public boolean hasPlayerPoints() {
+        return this.usePlayerPoints;
     }
 
     public String getMsg(String path) {
@@ -349,9 +347,8 @@ class MineCommands implements CommandExecutor {
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("booster")) {
-            if (plugin.getPlayerPointsAPI() != null) {
-                int points = plugin.getPlayerPointsAPI().look(player.getUniqueId());
-                player.sendMessage("§aSố dư Points hiện tại của bạn: §e" + points);
+            if (plugin.hasPlayerPoints()) {
+                player.sendMessage("§a[PlayerPoints] Đang kết nối đồng bộ hệ thống...");
             }
             player.sendMessage(plugin.getBoosterConfig().getString("gui.main-title", "&8&l⚡ Booster Menu").replace("&", "§"));
             return true;
