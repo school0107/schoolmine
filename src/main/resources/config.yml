@@ -1,30 +1,38 @@
-# =============================================================================
-# SchoolMine Configuration
-# Plugin for Leaf/Paper/Purpur 1.21+
-# =============================================================================
+# ==============================================================================
+#                               SCHOOLMINE CONFIGURATION
+# ==============================================================================
 
-# =============================================
-# AUTO PICKUP Settings
-# =============================================
-# =============================================
-# AUTO PICKUP Settings
-# =============================================
+# Hệ thống tin nhắn hiển thị trong Server (Hỗ trợ mã màu &)
+messages:
+  prefix: "&8[&6SchoolMine&8] &r"
+  no-permission: "&cBạn không có quyền thực hiện hành động này!"
+  reload-success: "&aĐã tải lại cấu hình config.yml và booster.yml thành công."
+  autopickup-on: "&aĐã BẬT tính năng tự động nhặt đồ."
+  autopickup-off: "&cĐã TẮT tính năng tự động nhặt đồ."
+  autosmelt-on: "&aĐã BẬT tính năng tự động nung quặng."
+  autosmelt-off: "&cĐã TẮT tính năng tự động nung quặng."
+  mining3x3-on: "&aĐã BẬT chế độ đào quặng diện rộng 3x3."
+  mining3x3-off: "&cĐã TẮT chế độ đào quặng diện rộng 3x3."
+  automine-on: "&aĐã BẬT chế độ tự động đào khoáng sản quanh người."
+  automine-off: "&cĐã TẮT chế độ tự động đào khoáng sản quanh người."
+
+# TÍNH NĂNG 1: AUTO PICKUP
 auto-pickup:
   default-enabled: true
+  # Vật phẩm nằm trong danh sách này sẽ không tự động hút thẳng vào kho đồ
   blacklist:
+    - STONE
     - DIRT
     - GRAVEL
-    - SAND
     - COBBLESTONE
+    - SAND
     - NETHERRACK
     - FLINT
 
-# =============================================
-# 3x3 MINING Settings
-# =============================================
+# TÍNH NĂNG 2: 3x3 MINING
 3x3-mining:
   default-enabled: false
-  require-correct-tool: true
+  # Chỉ các khối nằm trong whitelist này mới kích nổ hiệu ứng lan 3x3 để tránh nát map
   whitelist:
     - COAL_ORE
     - DEEPSLATE_COAL_ORE
@@ -54,119 +62,40 @@ auto-pickup:
     - DIAMOND_BLOCK
     - EMERALD_BLOCK
     - NETHERITE_BLOCK
-  require-correct-tool: true
-  radius: 1
 
-# =============================================
-# AUTO SMELT Settings
-# =============================================
+# TÍNH NĂNG 3: AUTO SMELT (Bản đồ chuyển đổi quặng thô sang thỏi thành phẩm)
 auto-smelt:
   default-enabled: true
   smelt-map:
+    RAW_IRON: IRON_INGOT
+    RAW_GOLD: GOLD_INGOT
+    RAW_COPPER: COPPER_INGOT
     IRON_ORE: IRON_INGOT
     DEEPSLATE_IRON_ORE: IRON_INGOT
     GOLD_ORE: GOLD_INGOT
     DEEPSLATE_GOLD_ORE: GOLD_INGOT
-    NETHER_GOLD_ORE: GOLD_NUGGET
     COPPER_ORE: COPPER_INGOT
     DEEPSLATE_COPPER_ORE: COPPER_INGOT
-    ANCIENT_DEBRIS: NETHERITE_SCRAP
-    COBBLESTONE: STONE
-    COBBLED_DEEPSLATE: DEEPSLATE
-    SAND: GLASS
-    CLAY: BRICK
-    NETHERRACK: NETHER_BRICK
-    RAW_IRON: IRON_INGOT
-    RAW_GOLD: GOLD_INGOT
-    RAW_COPPER: COPPER_INGOT
 
-# =============================================
-# AUTO MINE (Nuker vĩnh viễn) Settings
-# =============================================
+# TÍNH NĂNG 4 & 5: AUTO MINE
 auto-mine:
-  default-enabled: false
   default-radius: 2
 
-# =============================================
-# BLOCK REMOVE Settings
-# Block do người chơi đặt sẽ tự biến mất sau delay-seconds
-# =============================================
+# TÍNH NĂNG 6: BLOCK REMOVE QUEUE (Hàng đợi xóa khối đặt tự động)
 block-remove:
   enabled: true
+  # Thời gian đếm ngược (giây) trước khi biến mất hoàn toàn
   delay-seconds: 120
+  # Khoảng thời gian quét kiểm tra hàng đợi (40 ticks = 2 giây một lần để tiết kiệm CPU)
+  check-interval-ticks: 40
+  max-queue-size: 100000
+  persist-on-restart: true
+  # Danh sách thế giới áp dụng cơ chế tự dọn dẹp khối đặt (Để trống nếu áp dụng tất cả)
   world-whitelist:
-    - world
-    - world_nether
-    - world_the_end
+    - mine_world
+    - resource_world
+  # Khối block đặc biệt không bị tự động xóa khi đặt ra
   blacklist:
     - CHEST
-    - TRAPPED_CHEST
     - ENDER_CHEST
-    - BARREL
-    - FURNACE
-    - BLAST_FURNACE
-    - SMOKER
-    - CRAFTING_TABLE
-    - ANVIL
-    - CHIPPED_ANVIL
-    - DAMAGED_ANVIL
-    - ENCHANTING_TABLE
-    - BEACON
-    - SHULKER_BOX
-    - WHITE_SHULKER_BOX
-    - ORANGE_SHULKER_BOX
-    - MAGENTA_SHULKER_BOX
-    - LIGHT_BLUE_SHULKER_BOX
-    - YELLOW_SHULKER_BOX
-    - LIME_SHULKER_BOX
-    - PINK_SHULKER_BOX
-    - GRAY_SHULKER_BOX
-    - LIGHT_GRAY_SHULKER_BOX
-    - CYAN_SHULKER_BOX
-    - PURPLE_SHULKER_BOX
-    - BLUE_SHULKER_BOX
-    - BROWN_SHULKER_BOX
-    - GREEN_SHULKER_BOX
-    - RED_SHULKER_BOX
-    - BLACK_SHULKER_BOX
-    - HOPPER
-    - DROPPER
-    - DISPENSER
-    - SPAWNER
     - BEDROCK
-    - COMMAND_BLOCK
-    - CHAIN_COMMAND_BLOCK
-    - REPEATING_COMMAND_BLOCK
-    - STRUCTURE_BLOCK
-    - JIGSAW
-    - BARRIER
-  persist-on-restart: true
-  max-queue-size: 100000
-  check-interval-ticks: 40
-
-# =============================================
-# Messages
-# =============================================
-messages:
-  prefix: "&8[&6SchoolMine&8] &r"
-  autopickup-on: "&aAuto Pickup: &2ON"
-  autopickup-off: "&cAuto Pickup: &4OFF"
-  mining3x3-on: "&a3x3 Mining: &2ON"
-  mining3x3-off: "&c3x3 Mining: &4OFF"
-  autosmelt-on: "&aAuto Smelt: &2ON"
-  autosmelt-off: "&cAuto Smelt: &4OFF"
-  automine-on: "&aAuto Mine: &2ON"
-  automine-off: "&cAuto Mine: &4OFF"
-  no-permission: "&cBạn không có quyền sử dụng lệnh này!"
-  reload-success: "&aPlugin đã được reload thành công!"
-  usage-autopickup: "&eUsage: /autopickup [on|off]"
-  usage-3x3: "&eUsage: /3x3 [on|off]"
-  usage-autosmelt: "&eUsage: /autosmelt [on|off]"
-  usage-automine: "&eUsage: /automine [on|off]"
-
-# =============================================
-# Performance Settings
-# =============================================
-performance:
-  auto-save-interval: 300
-  max-3x3-blocks: 27
