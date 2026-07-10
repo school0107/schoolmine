@@ -2,132 +2,32 @@ name: SchoolMine
 version: 1.0.0
 main: com.schoolmine.SchoolMine
 api-version: '1.21'
-description: Plugin quan ly dao khoang san va he thong Booster nang cao.
-authors: [SchoolMineTeam]
-
-# Các plugin bắt buộc hoặc phụ thuộc mềm để hoạt động
-depend: [PlayerPoints]
-softdepend: [LuckPerms]
+softdepend: [PlayerPoints]
+authors: [school0107]
+description: SchoolMine core plugin with advanced mining features.
 
 commands:
-  autopickup:
-    [cite_start]description: Bat/Tat tu dong nhat item vao kho do[cite: 1, 2].
-    [cite_start]usage: /autopickup [on|off] [cite: 27]
-    permission: schoolmine.autopickup
-    [cite_start]permission-message: §cBan khong co quyen su dung lenh nay! [cite: 27]
-  3x3:
-    [cite_start]description: Bat/Tat tinh nang dao vung 3x3[cite: 1, 3].
-    [cite_start]usage: /3x3 [on|off] [cite: 27]
-    permission: schoolmine.3x3
-    [cite_start]permission-message: §cBan khong co quyen su dung lenh nay! [cite: 27]
-  autosmelt:
-    [cite_start]description: Bat/Tat tu dong nung quang thanh thoi[cite: 1, 4].
-    [cite_start]usage: /autosmelt [on|off] [cite: 27]
-    permission: schoolmine.autosmelt
-    [cite_start]permission-message: §cBan khong co quyen su dung lenh nay! [cite: 27]
-  automine:
-    [cite_start]description: Bat/Tat tinh nang Nuker tu dong pha khoi khi di chuyen[cite: 1, 4].
-    [cite_start]usage: /automine [on|off] [cite: 4]
-    permission: schoolmine.automine
-    [cite_start]permission-message: §cBan khong co quyen su dung lenh nay! [cite: 15]
-  booster:
-    [cite_start]description: Mo menu GUI hoac quan ly Booster bang PlayerPoints[cite: 1, 8].
-    [cite_start]aliases: [boosters] [cite: 14]
-    [cite_start]usage: /booster [clear|clearall] [cite: 14]
-    permission: schoolmine.booster
-    [cite_start]permission-message: §cBan khong co quyen su dung lenh nay! [cite: 27]
   schoolmine:
-    [cite_start]description: Lenh quan tri vien cho he thong SchoolMine[cite: 1, 14].
-    [cite_start]usage: /schoolmine [reload|status|help] [cite: 14]
+    description: Lenh quan tri plugin SchoolMine.
     permission: schoolmine.admin
-    [cite_start]permission-message: §cBan khong co quyen su dung lenh nay! [cite: 27]
-
-permissions:
-  schoolmine.admin:
-    [cite_start]description: Cap tat ca cac quyen han trong plugin cho Admin[cite: 1, 15].
-    default: op
-    children:
-      schoolmine.booster.admin: true
-      schoolmine.reload: true
-      schoolmine.autopickup: true
-      schoolmine.3x3: true
-      schoolmine.autosmelt: true
-      schoolmine.automine: true
-
-  schoolmine.autopickup:
-    [cite_start]description: Cho phep nguoi choi bat/tat tinh nang Auto Pickup[cite: 1, 15].
-    default: op
-
-  schoolmine.3x3:
-    [cite_start]description: Cho phep nguoi choi bat/tat tinh nang Dao 3x3[cite: 1, 15].
-    default: op
-
-  schoolmine.autosmelt:
-    [cite_start]description: Cho phep nguoi choi bat/tat tinh nang Auto Smelt[cite: 1, 15].
-    default: op
-
-  schoolmine.automine:
-    [cite_start]description: Cho phep nguoi choi bat/tat tinh nang Auto Mine (Nuker vinh vien)[cite: 1, 4, 15].
-    default: op
-
-  schoolmine.booster:
-    [cite_start]description: Cho phep mo menu mua cac loai Booster bang PlayerPoints[cite: 1, 8, 15].
-    default: true
-
-  schoolmine.booster.admin:
-    [cite_start]description: Cho phep xoa hoac xoa tat ca booster dang hoat dong[cite: 1, 14, 15].
-    default: op
-
-  schoolmine.reload:
-    [cite_start]description: Cho phep tai lai file cau hinh config.yml va booster.yml[cite: 1, 14, 15].
-    default: op
-
-  schoolmine.breakblock:
-    [cite_start]description: Neu dat thanh false thi khoi nguoi choi do dat se khong bi tu dong xoa sau 120s[cite: 1, 8, 15].
-    default: true
-
-  # Hệ số nhân rơi vật phẩm (Drop Multiplier Permissions)
-  mine.x1.2:
-    [cite_start]description: Nhan he so roi vat pham len x1.2[cite: 1, 5].
-    default: false
-  mine.x1.4:
-    [cite_start]description: Nhan he so roi vat pham len x1.4[cite: 1, 5].
-    default: false
-  mine.x1.6:
-    [cite_start]description: Nhan he so roi vat pham len x1.6[cite: 1, 5].
-    default: false
-  mine.x1.8:
-    [cite_start]description: Nhan he so roi vat pham len x1.8[cite: 1, 5].
-    default: false
-  mine.x2:
-    [cite_start]description: Nhan he so roi vat pham len x2.0[cite: 1, 5].
-    default: false
-  mine.x3:
-    [cite_start]description: Nhan he so roi vat pham len x3.0[cite: 1, 5].
-    default: false
-  mine.x4:
-    [cite_start]description: Nhan he so roi vat pham len x4.0[cite: 1, 5].
-    default: false
-  mine.x5:
-    [cite_start]description: Nhan he so roi vat pham len x5.0[cite: 1, 5].
-    default: false
-
-  # Bán kính tự động đào (AutoMine Radius Permissions)
-  automine.1:
-    [cite_start]description: Ban kinh tu dong dao rong 1 block[cite: 1, 7].
-    default: false
-  automine.2:
-    [cite_start]description: Ban kinh tu dong dao rong 2 block[cite: 1, 7].
-    default: false
-  automine.3:
-    [cite_start]description: Ban kinh tu dong dao rong 3 block[cite: 1, 7].
-    default: false
-  automine.4:
-    [cite_start]description: Ban kinh tu dong dao rong 4 block[cite: 1, 7].
-    default: false
-  automine.5:
-    [cite_start]description: Ban kinh tu dong dao rong 5 block[cite: 1, 7].
-    default: false
-  automine.6:
-    [cite_start]description: Ban kinh tu dong dao rong 6 block[cite: 1, 7].
-    default: false
+    usage: /schoolmine [reload|status|help]
+  autopickup:
+    description: Bat tat tu dong nhat do.
+    permission: schoolmine.autopickup
+    usage: /autopickup [on|off]
+  autosmelt:
+    description: Bat tat tu dong nung quang.
+    permission: schoolmine.autosmelt
+    usage: /autosmelt [on|off]
+  3x3:
+    description: Bat tat che do dao 3x3.
+    permission: schoolmine.3x3
+    usage: /3x3 [on|off]
+  automine:
+    description: Bat tat che do tu dong dao khoang san xung quanh.
+    permission: schoolmine.automine
+    usage: /automine [on|off]
+  booster:
+    description: Mo menu mua booster bang PlayerPoints.
+    permission: schoolmine.booster
+    usage: /booster
