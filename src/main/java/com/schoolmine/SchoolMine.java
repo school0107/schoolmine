@@ -21,6 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.black_ixx.playerpoints.PlayerPoints;
+import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -37,12 +39,17 @@ public final class SchoolMine extends JavaPlugin implements Listener {
     private FileConfiguration boosterConfig;
     private FileConfiguration queueStorage;
     private File queueFile;
+    private PlayerPointsAPI ppAPI;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         saveResource("booster.yml", false);
         loadBoosterConfig();
+        
+        if (getServer().getPluginManager().getPlugin("PlayerPoints") != null) {
+            this.ppAPI = PlayerPoints.getInstance().getAPI();
+        }
         
         queueFile = new File(getDataFolder(), "blockremove_queue.yml");
         if (!queueFile.exists()) {
@@ -96,6 +103,10 @@ public final class SchoolMine extends JavaPlugin implements Listener {
 
     public FileConfiguration getBoosterConfig() {
         return this.boosterConfig;
+    }
+
+    public PlayerPointsAPI getPlayerPointsAPI() {
+        return this.ppAPI;
     }
 
     public String getMsg(String path) {
@@ -338,6 +349,10 @@ class MineCommands implements CommandExecutor {
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("booster")) {
+            if (plugin.getPlayerPointsAPI() != null) {
+                int points = plugin.getPlayerPointsAPI().look(player.getUniqueId());
+                player.sendMessage("§aSố dư Points hiện tại của bạn: §e" + points);
+            }
             player.sendMessage(plugin.getBoosterConfig().getString("gui.main-title", "&8&l⚡ Booster Menu").replace("&", "§"));
             return true;
         }
