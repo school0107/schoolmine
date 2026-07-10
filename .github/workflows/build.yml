@@ -2,35 +2,23 @@ name: Build SchoolMine Plugin
 
 on:
   push:
-    branches: [ "main", "master" ] # Tự động build khi bạn push code lên nhánh chính
-  pull_request:
-    branches: [ "main", "master" ]
-  workflow_dispatch: # Cho phép bạn bấm nút tự tay Build bất cứ lúc nào
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    # Bước 1: Lấy mã nguồn từ repo về máy ảo GitHub
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    # Bước 2: Thiết lập môi trường Java 21 (Theo đúng yêu cầu plugin)
+    - uses: actions/checkout@v3
     - name: Set up JDK 21
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v3
       with:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-
-    # Bước 3: Thực hiện biên dịch và đóng gói thành file .jar
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
-
-    # Bước 4: Đẩy file .jar đã build lên mục Artifact để bạn tải về
+      run: mvn clean package
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: SchoolMine-Jar-File
+        name: SchoolMine-Jar
         path: target/*.jar
