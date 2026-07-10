@@ -5,11 +5,9 @@
 
 # =============================================
 # AUTO PICKUP Settings
-# Tự động nhặt item và hút EXP thẳng vào người khi đào
 # =============================================
 auto-pickup:
-  [cite_start]default-enabled: true # Mặc định tự bật khi người chơi mới tham gia 
-  # Các block nằm trong danh sách này sẽ rớt ra đất như bình thường, không tự nhặt [cite: 2]
+  default-enabled: true
   blacklist:
     - DIRT
     - GRAVEL
@@ -20,13 +18,9 @@ auto-pickup:
 
 # =============================================
 # 3x3 MINING Settings
-# Đào 1 ô lan ra vùng 3x3 xung quanh dựa theo hướng nhìn [cite: 2, 3]
 # =============================================
 3x3-mining:
-  [cite_start]default-enabled: false # Mặc định tắt, dùng lệnh /3x3 để bật [cite: 3, 20]
-  [cite_start]require-correct-tool: true # Yêu cầu cầm đúng loại cuốc/rìu phù hợp với khối đá/gỗ [cite: 3, 22]
-  [cite_start]radius: 1 # Bán kính lan tỏa (1 block xung quanh tạo thành vùng 3x3) [cite: 22]
-  # Chỉ phá các khối nằm trong danh sách whitelist dưới đây để tránh nát map [cite: 3, 20]
+  default-enabled: false
   whitelist:
     - COAL_ORE
     - DEEPSLATE_COAL_ORE
@@ -62,14 +56,14 @@ auto-pickup:
     - RAW_GOLD_BLOCK
     - AMETHYST_BLOCK
     - STONE
+  require-correct-tool: true
+  radius: 1
 
 # =============================================
 # AUTO SMELT Settings
-# Tự động chuyển quặng thô thành thỏi ingot ngay khi đào [cite: 3, 4]
 # =============================================
 auto-smelt:
-  [cite_start]default-enabled: true # Mặc định tự động kích hoạt tính năng [cite: 22]
-  # Sơ đồ chuyển đổi vật phẩm (Block đào -> Vật phẩm nhận được) [cite: 4, 22]
+  default-enabled: true
   smelt-map:
     IRON_ORE: IRON_INGOT
     DEEPSLATE_IRON_ORE: IRON_INGOT
@@ -89,28 +83,23 @@ auto-smelt:
     RAW_COPPER: COPPER_INGOT
 
 # =============================================
-# AUTO MINE (NUKER vĩnh viễn) Settings
-# Tính năng tự động quét và phá các block quặng xung quanh khi di chuyển [cite: 4]
+# AUTO MINE (Nuker vĩnh viễn) Settings
 # =============================================
 auto-mine:
-  [cite_start]default-enabled: false # Mặc định tắt, dùng /automine để kích hoạt [cite: 5]
-  [cite_start]default-radius: 2 # Bán kính quét mặc định nếu người chơi không có quyền automine.N [cite: 7]
-  
+  default-enabled: false
+  default-radius: 2
+
 # =============================================
 # BLOCK REMOVE Settings
-# Khối do người chơi đặt xuống sẽ tự biến mất sau một khoảng thời gian [cite: 7, 23]
+# Block do người chơi đặt sẽ tự biến mất sau delay-seconds
 # =============================================
 block-remove:
-  [cite_start]enabled: true # Bật/tắt toàn bộ hệ thống xóa khối [cite: 23]
-  [cite_start]delay-seconds: 120 # Thời gian tồn tại của khối (giây) trước khi biến mất [cite: 7, 23]
-  
-  # Danh sách thế giới áp dụng tính năng xóa khối này [cite: 23]
+  enabled: true
+  delay-seconds: 120
   world-whitelist:
     - world
     - world_nether
     - world_the_end
-
-  # Danh sách các khối chức năng KHÔNG bao giờ bị xóa tự động [cite: 8, 24]
   blacklist:
     - CHEST
     - TRAPPED_CHEST
@@ -153,36 +142,33 @@ block-remove:
     - STRUCTURE_BLOCK
     - JIGSAW
     - BARRIER
-
-  [cite_start]persist-on-restart: true # Lưu lại danh sách hàng đợi hàng chờ khi restart server [cite: 8, 26]
-  [cite_start]max-queue-size: 100000 # Số lượng block tối đa nằm trong hàng đợi xóa [cite: 26]
-  [cite_start]check-interval-ticks: 40 # Chu kỳ quét hàng đợi (40 ticks = 2 giây quét 1 lần) [cite: 26]
+  persist-on-restart: true
+  max-queue-size: 100000
+  check-interval-ticks: 40
 
 # =============================================
-# Messages Configuration
-# Hệ thống tin nhắn tùy chỉnh trong máy chủ [cite: 26]
+# Messages
 # =============================================
 messages:
-  [cite_start]prefix: "&8[&6SchoolMine&8] &r" # Tiền tố đứng trước các thông báo [cite: 26]
-  [cite_start]autopickup-on: "&aAuto Pickup: &2ON" [cite: 26]
-  [cite_start]autopickup-off: "&cAuto Pickup: &4OFF" [cite: 26]
-  [cite_start]mining3x3-on: "&a3x3 Mining: &2ON" [cite: 26]
-  [cite_start]mining3x3-off: "&c3x3 Mining: &4OFF" [cite: 27]
-  [cite_start]autosmelt-on: "&aAuto Smelt: &2ON" [cite: 27]
-  [cite_start]autosmelt-off: "&cAuto Smelt: &4OFF" [cite: 27]
-  automine-on: "&aAuto Mine (Nuker): &2ON"
-  automine-off: "&cAuto Mine (Nuker): &4OFF"
-  [cite_start]no-permission: "&cBạn không có quyền sử dụng lệnh này!" [cite: 27]
-  [cite_start]reload-success: "&aPlugin đã được reload thành công!" [cite: 28]
-  [cite_start]usage-autopickup: "&eSử dụng: /autopickup [on|off]" [cite: 28]
-  [cite_start]usage-3x3: "&eSử dụng: /3x3 [on|off]" [cite: 28]
-  [cite_start]usage-autosmelt: "&eSử dụng: /autosmelt [on|off]" [cite: 28]
-  usage-automine: "&eSử dụng: /automine [on|off]"
+  prefix: "&8[&6SchoolMine&8] &r"
+  autopickup-on: "&aAuto Pickup: &2ON"
+  autopickup-off: "&cAuto Pickup: &4OFF"
+  mining3x3-on: "&a3x3 Mining: &2ON"
+  mining3x3-off: "&c3x3 Mining: &4OFF"
+  autosmelt-on: "&aAuto Smelt: &2ON"
+  autosmelt-off: "&cAuto Smelt: &4OFF"
+  automine-on: "&aAuto Mine: &2ON"
+  automine-off: "&cAuto Mine: &4OFF"
+  no-permission: "&cBạn không có quyền sử dụng lệnh này!"
+  reload-success: "&aPlugin đã được reload thành công!"
+  usage-autopickup: "&eUsage: /autopickup [on|off]"
+  usage-3x3: "&eUsage: /3x3 [on|off]"
+  usage-autosmelt: "&eUsage: /autosmelt [on|off]"
+  usage-automine: "&eUsage: /automine [on|off]"
 
 # =============================================
-# Performance & Limits Settings
-# Tối ưu hiệu năng tránh gây giật lag máy chủ [cite: 28]
+# Performance Settings
 # =============================================
 performance:
-  [cite_start]auto-save-interval: 300 # Khoảng thời gian tự động lưu dữ liệu player (giây) [cite: 28]
-  [cite_start]max-3x3-blocks: 27 # Số lượng khối tối đa được xử lý cùng lúc [cite: 28]
+  auto-save-interval: 300
+  max-3x3-blocks: 27
